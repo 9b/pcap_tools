@@ -1,3 +1,4 @@
+
 #!/usr/bin/python
 
 __description__ = 'Summarize a PCAP file to standard out'
@@ -17,29 +18,27 @@ def main():
     if options.file:
         miner = pcap_miner(options.file)
 
-	print "== DNS Queries and Domains ==\n"
-	for dns in miner.get_dns_request_data():
-	    print(dns['type'] + " - " + dns['request'] + " - " + dns['response'])	
+        print "== DNS Queries and Domains ==\n"
+        for dns in miner.get_dns_request_data():
+            print(dns['type'] + " - " + dns['request'] + " - " + dns['response'])
 
-	print "\n== Destination Addresses ==\n"
-	for ip in miner.get_destination_ip_details():
-	    print(ip['ip_address'] + " - " + ip['owner'] + " - " + ip['asn'] + " - " + ip['block'])	
-		
-	print "\n== Request Dump ==\n"
-	for info in miner.get_http_request_data():
-	    for key, value in info.items():
-		print(key + " - " + value)
-	    print("\n")
+        print "\n== Destination Addresses ==\n"
+        for ip in miner.get_destination_ip_details():
+            print(ip['ip_address'] + " - " + ip['owner'] + " - " + ip['asn'] + " - " + ip['block'])
 
-	print "\n== Flows ==\n"
-    for info in miner.get_flows():
-        print(info + "\n")
-	
+        print "\n== Request Dump ==\n"
+        for info in miner.get_http_request_data():
+            for key, value in info.items():
+	            print(key + " - " + value)
+            print("\n")
+
+        print "\n== Flows ==\n"
+        for info in miner.get_flows():
+            print(info)
+
     else:
         oParser.print_help()
         return
 
 if __name__ == '__main__':
     main()
-
-
