@@ -1,0 +1,16 @@
+255.255.255.255 -  -  - 
+10.0.2.15 -  -  - 
+239.255.255.250 -  -  - 
+10.0.2.255 -  -  - 
+192.168.249.2 -  -  - 
+224.0.0.22 -  -  - 
+65.55.21.19 - MICROSOFT-CORP---MSN-AS-BLOCK - Microsoft Corp - 8075 - 65.55.0.0/19
+178.162.174.162 - LEASEWEB-DE Leaseweb Germany GmbH (previously netdirekt e. K.) - 28753 - 178.162.128.0/17
+209.139.208.130 - GT-BELL - Bell Canada - 6539 - 209.139.192.0/19
+69.64.38.6 - SERVER4YOU - Hosting Solutions International, Inc. - 30083 - 69.64.32.0/19
+46.4.30.143 - HETZNER-AS Hetzner Online AG RZ - 24940 - 46.4.0.0/16
+66.197.204.134 - NOC - Network Operations Center Inc. - 21788 - 66.197.128.0/17
+216.92.12.78 - PAIR-NETWORKS - pair Networks - 7859 - 216.92.0.0/16
+72.14.204.147 - GOOGLE - Google Inc. - 15169 - 72.14.204.0/23
+72.14.204.105 - GOOGLE - Google Inc. - 15169 - 72.14.204.0/23
+66.70.127.101 - DATAPIPE-SEA - DataPipe, Inc. - 22205 - 66.70.120.0/21
