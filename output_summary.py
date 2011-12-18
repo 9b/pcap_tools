@@ -30,6 +30,10 @@ def main():
 	    for key, value in info.items():
 		print(key + " - " + value)
 	    print("\n")
+
+	print "\n== Flows ==\n"
+    for info in miner.get_flows():
+        print(info + "\n")
 	
     else:
         oParser.print_help()

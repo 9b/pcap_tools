@@ -110,7 +110,7 @@ class pcap_miner():
             except Exception, e:
                 continue
             try:
-                self._flows.append(source_ip + "/" + destination_ip + "/" + str(protocol.dport))
+                self._flows.append(source_ip + "/" + str(protocol.sport) + "=>" + destination_ip + "/" + str(protocol.dport))
             except Exception, e:
                 continue
                                    
