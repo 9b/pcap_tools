@@ -3,14 +3,19 @@ import itertools
 import operator
 
 try:
-	import dpkt
+    import dpkt
 except:
-	print "Download dpkt"
+    print "Download dpkt"
 
 try:
-	import cymruwhois
+    import cymruwhois
 except:
-	print "Download cymruwhois"
+    print "Download cymruwhois"
+    
+try:
+    import simplejson as json
+except:
+    print "Download simplejson"
 
 class pcap_miner():
     def __init__(self,pcap_file):
@@ -26,16 +31,16 @@ class pcap_miner():
         self._packet_count = 0
         self._http_count = 0
         self._dns_count = 0
-        
+
         #processing
         self._handle = self._get_dpkt_handle()
         self._extract_data()
-        
+
     def _get_dpkt_handle(self):
         f = open(self._pcap_file)
         pcap = dpkt.pcap.Reader(f)
         return pcap
-    
+
     def unpack_ip(self,packed_ip):
         ip = socket.inet_ntoa(packed_ip)
         return ip
@@ -43,7 +48,7 @@ class pcap_miner():
     def quick_unique(self,seq):
         seen = set()
         return [ x for x in seq if x not in seen and not seen.add(x)]
-    
+
     def _extract_data(self):
         pcap = self._handle
         eth = None
@@ -57,9 +62,9 @@ class pcap_miner():
                 protocol = ip.data
             except dpkt.dpkt.NeedData:
                 continue
-            
+
             self._packet_count += 1
-            
+
             try:
                 source_ip = self.unpack_ip(ip.src)
                 destination_ip = self.unpack_ip(ip.dst)
@@ -67,7 +72,7 @@ class pcap_miner():
                 self._destination_ips.append(destination_ip)
             except Exception, e:
                 continue
-            
+
             try:
                 if protocol.dport == 80 or protocol.dport == 443:
                     self._http_count += 1
@@ -84,7 +89,7 @@ class pcap_miner():
                         continue
             except Exception, e:
                 continue
-                
+
             try:
                 if protocol.dport == 53 or protocol.sport == 53:
                     self._dns_count += 1
@@ -113,10 +118,10 @@ class pcap_miner():
                 self._flows.append(source_ip + "/" + str(protocol.sport) + "=>" + destination_ip + "/" + str(protocol.dport))
             except Exception, e:
                 continue
-                                   
+
     def get_source_ips(self):
         return self.quick_unique(self._source_ips)
-    
+
     def get_source_ip_details(self):
         ulist = self.quick_unique(self._source_ips)
         c = cymruwhois.Client()
@@ -129,12 +134,12 @@ class pcap_miner():
                 self._source_ip_details.append(tmp)
             except Exception, e:
                 continue
-                
+
         return self._source_ip_details
-                
+
     def get_destination_ips(self):
         return self.quick_unique(self._destination_ips)
-    
+
     def get_destination_ip_details(self):
         ulist = self.quick_unique(self._destination_ips)
         c = cymruwhois.Client()
@@ -147,9 +152,9 @@ class pcap_miner():
                 self._destination_ip_details.append(tmp)
             except Exception, e:
                 continue
-                
+
         return self._destination_ip_details
-    
+
     def get_http_request_data(self):
         getvals = operator.itemgetter('source_ip','destination_ip', 'uri')
         self._http_request_data.sort(key=getvals)
@@ -160,7 +165,7 @@ class pcap_miner():
 
         self._http_request_data[:] = result
         return self._http_request_data
-    
+
     def get_dns_request_data(self):
         getvals = operator.itemgetter('type','request', 'response')
         self._dns_request_data.sort(key=getvals)
@@ -171,15 +176,53 @@ class pcap_miner():
 
         self._dns_request_data[:] = result
         return self._dns_request_data
-                
+
     def get_flows(self):
         return self.quick_unique(self._flows)
-    
+
     def get_packet_count(self):
         return self._packet_count
-    
+
     def get_http_count(self):
         return self._http_count
-    
+
     def get_dns_count(self):
         return self._dns_count
+    
+    def summary2json(self):
+        self._dns_json = []
+	self._dest_json = []
+	self._http_json = []
+	self._flow_json = []
+	self._counts_json = []
+
+	self._counts_json.append({"packet_count":self._packet_count,"http_count":self._http_count,"dns_count":self._dns_count})
+	
+        for dns in self.get_dns_request_data():
+            self._dns_json.append({"type": dns["type"], "request": dns["request"], "response": dns["response"]})
+            
+	for ip in self.get_destination_ip_details():
+	    self._dest_json.append({"ip_address" : ip['ip_address'], "owner": ip['owner'], "asn": ip['asn'], "netblock": ip['block']})   
+	    
+	for info in self.get_http_request_data():
+	    tmp = {}
+	    for key, value in info.items():
+		tmp[key] = value	    
+	    self._http_json.append(tmp)
+
+	for flow in self.get_flows():
+	    direction = flow.split("=>")
+	    source = direction[0].split("/")
+	    destination = direction[1].split("/")
+	    self._flow_json.append({"source_ip":source[0],"source_port":source[1],"destination_ip":destination[0],"destination_port":destination[1]})
+	    
+	#construct the output object
+	obj = {"file":self._pcap_file,
+	       "dns_data":self._dns_json,
+	       "destination_ip_details":self._dest_json,
+	       "http_requests":self._http_json,
+	       "flows":self._flow_json,
+	       "counts":self._counts_json
+	       }
+	
+	return json.dumps(obj)
