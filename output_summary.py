@@ -16,18 +16,16 @@ def main():
 
     if options.file:
         miner = pcap_miner(options.file)
-	#file 1 - DNS queries and domains returned	
+
 	print "== DNS Queries and Domains ==\n"
 	for dns in miner.get_dns_request_data():
 	    print(dns['type'] + " - " + dns['request'] + " - " + dns['response'])	
 
 	print "\n== Destination Addresses ==\n"
-	#file 3 - IPs of attackers with whois 
 	for ip in miner.get_destination_ip_details():
 	    print(ip['ip_address'] + " - " + ip['owner'] + " - " + ip['asn'] + " - " + ip['block'])	
 		
 	print "\n== Request Dump ==\n"
-	#file 5 - whatever can be dumped from the request
 	for info in miner.get_http_request_data():
 	    for key, value in info.items():
 		print(key + " - " + value)
